@@ -20,7 +20,7 @@ where
     for<'b> &'b T: A,
     <&'static T as A>::X: Sized
 {
-    let _x = *s; // requires 'a: 'static
+    let _x = *s; //~ ERROR mismatched types [E0308]
 }
 
 fn main() {}
