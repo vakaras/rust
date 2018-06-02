@@ -117,6 +117,15 @@ impl CompareMode {
             x => panic!("unknown --compare-mode option: {}", x),
         }
     }
+
+    /// Returns the mode of which test file should be used if the test file for the mode
+    /// `self` was not found.
+    pub fn fallback_compare_modes(&self) -> &[CompareMode] {
+        match *self {
+            CompareMode::Nll => &[],
+            CompareMode::Polonius => &[CompareMode::Nll],
+        }
+    }
 }
 
 #[derive(Clone)]

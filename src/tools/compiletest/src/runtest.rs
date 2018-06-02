@@ -2929,19 +2929,23 @@ impl<'test> TestCx<'test> {
             kind,
         );
 
-        if !path.exists() {
-            if let Some(CompareMode::Polonius) = self.config.compare_mode {
-                path = expected_output_path(
-                    &self.testpaths,
-                    self.revision,
-                    &Some(CompareMode::Nll),
-                    kind,
-                );
+        if let Some(ref compare_mode) = self.config.compare_mode {
+            if !path.exists() {
+                for fallback_compare_mode in compare_mode.fallback_compare_modes() {
+                    path = expected_output_path(
+                        &self.testpaths,
+                        self.revision,
+                        &Some(fallback_compare_mode.clone()),
+                        kind,
+                    );
+                    if path.exists() {
+                        break;
+                    }
+                }
+                if !path.exists() {
+                    path = expected_output_path(&self.testpaths, self.revision, &None, kind);
+                }
             }
-        }
-
-        if !path.exists() {
-            path = expected_output_path(&self.testpaths, self.revision, &None, kind);
         }
 
         path
