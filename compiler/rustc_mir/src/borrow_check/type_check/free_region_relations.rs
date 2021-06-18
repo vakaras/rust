@@ -20,7 +20,7 @@ use crate::borrow_check::{
 };
 
 #[derive(Debug)]
-crate struct UniversalRegionRelations<'tcx> {
+pub struct UniversalRegionRelations<'tcx> {
     universal_regions: Rc<UniversalRegions<'tcx>>,
 
     /// Stores the outlives relations that are known to hold from the
@@ -53,13 +53,13 @@ type RegionBoundPairs<'tcx> = Vec<(ty::Region<'tcx>, GenericKind<'tcx>)>;
 /// then the output type as the last element.
 type NormalizedInputsAndOutput<'tcx> = Vec<Ty<'tcx>>;
 
-crate struct CreateResult<'tcx> {
-    pub(in crate::borrow_check) universal_region_relations: Frozen<UniversalRegionRelations<'tcx>>,
-    crate region_bound_pairs: RegionBoundPairs<'tcx>,
-    crate normalized_inputs_and_output: NormalizedInputsAndOutput<'tcx>,
+pub struct CreateResult<'tcx> {
+    pub universal_region_relations: Frozen<UniversalRegionRelations<'tcx>>,
+    pub region_bound_pairs: RegionBoundPairs<'tcx>,
+    pub normalized_inputs_and_output: NormalizedInputsAndOutput<'tcx>,
 }
 
-crate fn create(
+pub fn create(
     infcx: &InferCtxt<'_, 'tcx>,
     param_env: ty::ParamEnv<'tcx>,
     implicit_region_bound: Option<ty::Region<'tcx>>,
@@ -97,7 +97,7 @@ impl UniversalRegionRelations<'tcx> {
     ///
     /// (See `TransitiveRelation::postdom_upper_bound` for details on
     /// the postdominating upper bound in general.)
-    crate fn postdom_upper_bound(&self, fr1: RegionVid, fr2: RegionVid) -> RegionVid {
+    pub fn postdom_upper_bound(&self, fr1: RegionVid, fr2: RegionVid) -> RegionVid {
         assert!(self.universal_regions.is_universal_region(fr1));
         assert!(self.universal_regions.is_universal_region(fr2));
         *self
@@ -111,7 +111,7 @@ impl UniversalRegionRelations<'tcx> {
     /// outlives `fr` and (b) is not local.
     ///
     /// (*) If there are multiple competing choices, we return all of them.
-    crate fn non_local_upper_bounds(&'a self, fr: &'a RegionVid) -> Vec<&'a RegionVid> {
+    pub fn non_local_upper_bounds(&'a self, fr: &'a RegionVid) -> Vec<&'a RegionVid> {
         debug!("non_local_upper_bound(fr={:?})", fr);
         let res = self.non_local_bounds(&self.inverse_outlives, fr);
         assert!(!res.is_empty(), "can't find an upper bound!?");
@@ -120,7 +120,7 @@ impl UniversalRegionRelations<'tcx> {
 
     /// Returns the "postdominating" bound of the set of
     /// `non_local_upper_bounds` for the given region.
-    crate fn non_local_upper_bound(&self, fr: RegionVid) -> RegionVid {
+    pub fn non_local_upper_bound(&self, fr: RegionVid) -> RegionVid {
         let upper_bounds = self.non_local_upper_bounds(&fr);
 
         // In case we find more than one, reduce to one for
@@ -149,7 +149,7 @@ impl UniversalRegionRelations<'tcx> {
     ///
     /// (*) If there are multiple competing choices, we pick the "postdominating"
     /// one. See `TransitiveRelation::postdom_upper_bound` for details.
-    crate fn non_local_lower_bound(&self, fr: RegionVid) -> Option<RegionVid> {
+    pub fn non_local_lower_bound(&self, fr: RegionVid) -> Option<RegionVid> {
         debug!("non_local_lower_bound(fr={:?})", fr);
         let lower_bounds = self.non_local_bounds(&self.outlives, &fr);
 
@@ -205,18 +205,18 @@ impl UniversalRegionRelations<'tcx> {
     /// Returns `true` if fr1 is known to outlive fr2.
     ///
     /// This will only ever be true for universally quantified regions.
-    crate fn outlives(&self, fr1: RegionVid, fr2: RegionVid) -> bool {
+    pub fn outlives(&self, fr1: RegionVid, fr2: RegionVid) -> bool {
         self.outlives.contains(&fr1, &fr2)
     }
 
     /// Returns a vector of free regions `x` such that `fr1: x` is
     /// known to hold.
-    crate fn regions_outlived_by(&self, fr1: RegionVid) -> Vec<&RegionVid> {
+    pub fn regions_outlived_by(&self, fr1: RegionVid) -> Vec<&RegionVid> {
         self.outlives.reachable_from(&fr1)
     }
 
     /// Returns the _non-transitive_ set of known `outlives` constraints between free regions.
-    crate fn known_outlives(&self) -> impl Iterator<Item = (&RegionVid, &RegionVid)> {
+    pub fn known_outlives(&self) -> impl Iterator<Item = (&RegionVid, &RegionVid)> {
         self.outlives.base_edges()
     }
 }

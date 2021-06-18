@@ -33,10 +33,10 @@ use crate::borrow_check::{
     universal_regions::UniversalRegions,
 };
 
-mod dump_mir;
-mod graphviz;
-mod opaque_types;
-mod reverse_sccs;
+pub mod dump_mir;
+pub mod graphviz;
+pub mod opaque_types;
+pub mod reverse_sccs;
 
 pub mod values;
 

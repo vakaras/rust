@@ -90,11 +90,11 @@ macro_rules! span_mirbug_and_err {
     })
 }
 
-mod constraint_conversion;
+pub mod constraint_conversion;
 pub mod free_region_relations;
-mod input_output;
-crate mod liveness;
-mod relate_tys;
+pub mod input_output;
+pub mod liveness;
+pub mod relate_tys;
 
 /// Type checks the given `mir` in the context of the inference
 /// context `infcx`. Returns any region constraints that have yet to
@@ -120,7 +120,7 @@ mod relate_tys;
 /// - `flow_inits` -- results of a maybe-init dataflow analysis
 /// - `move_data` -- move-data constructed when performing the maybe-init dataflow analysis
 /// - `elements` -- MIR region map
-pub(crate) fn type_check<'mir, 'tcx>(
+pub fn type_check<'mir, 'tcx>(
     infcx: &InferCtxt<'_, 'tcx>,
     param_env: ty::ParamEnv<'tcx>,
     body: &Body<'tcx>,
@@ -832,27 +832,27 @@ struct BorrowCheckContext<'a, 'tcx> {
 }
 
 crate struct MirTypeckResults<'tcx> {
-    crate constraints: MirTypeckRegionConstraints<'tcx>,
-    pub(in crate::borrow_check) universal_region_relations: Frozen<UniversalRegionRelations<'tcx>>,
-    crate opaque_type_values: VecMap<OpaqueTypeKey<'tcx>, Ty<'tcx>>,
+    pub constraints: MirTypeckRegionConstraints<'tcx>,
+    pub universal_region_relations: Frozen<UniversalRegionRelations<'tcx>>,
+    pub opaque_type_values: VecMap<OpaqueTypeKey<'tcx>, Ty<'tcx>>,
 }
 
 /// A collection of region constraints that must be satisfied for the
 /// program to be considered well-typed.
-crate struct MirTypeckRegionConstraints<'tcx> {
+pub struct MirTypeckRegionConstraints<'tcx> {
     /// Maps from a `ty::Placeholder` to the corresponding
     /// `PlaceholderIndex` bit that we will use for it.
     ///
     /// To keep everything in sync, do not insert this set
     /// directly. Instead, use the `placeholder_region` helper.
-    crate placeholder_indices: PlaceholderIndices,
+    pub placeholder_indices: PlaceholderIndices,
 
     /// Each time we add a placeholder to `placeholder_indices`, we
     /// also create a corresponding "representative" region vid for
     /// that wraps it. This vector tracks those. This way, when we
     /// convert the same `ty::RePlaceholder(p)` twice, we can map to
     /// the same underlying `RegionVid`.
-    crate placeholder_index_to_region: IndexVec<PlaceholderIndex, ty::Region<'tcx>>,
+    pub placeholder_index_to_region: IndexVec<PlaceholderIndex, ty::Region<'tcx>>,
 
     /// In general, the type-checker is not responsible for enforcing
     /// liveness constraints; this job falls to the region inferencer,
@@ -861,16 +861,16 @@ crate struct MirTypeckRegionConstraints<'tcx> {
     /// not otherwise appear in the MIR -- in particular, the
     /// late-bound regions that it instantiates at call-sites -- and
     /// hence it must report on their liveness constraints.
-    crate liveness_constraints: LivenessValues<RegionVid>,
+    pub liveness_constraints: LivenessValues<RegionVid>,
 
-    crate outlives_constraints: OutlivesConstraintSet<'tcx>,
+    pub outlives_constraints: OutlivesConstraintSet<'tcx>,
 
-    crate member_constraints: MemberConstraintSet<'tcx, RegionVid>,
+    pub member_constraints: MemberConstraintSet<'tcx, RegionVid>,
 
-    crate closure_bounds_mapping:
+    pub closure_bounds_mapping:
         FxHashMap<Location, FxHashMap<(RegionVid, RegionVid), (ConstraintCategory, Span)>>,
 
-    crate type_tests: Vec<TypeTest<'tcx>>,
+    pub type_tests: Vec<TypeTest<'tcx>>,
 }
 
 impl MirTypeckRegionConstraints<'tcx> {

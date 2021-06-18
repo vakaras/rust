@@ -45,25 +45,25 @@ use self::MutateMode::{JustWrite, WriteAndRead};
 
 use self::path_utils::*;
 
-mod borrow_set;
-mod constraint_generation;
-mod constraints;
-mod def_use;
-mod diagnostics;
-mod facts;
-mod invalidation;
-mod location;
-mod member_constraints;
-mod nll;
-mod path_utils;
-mod place_ext;
-mod places_conflict;
-mod prefixes;
-mod region_infer;
-mod renumber;
-mod type_check;
-mod universal_regions;
-mod used_muts;
+pub mod borrow_set;
+pub mod constraint_generation;
+pub mod constraints;
+pub mod def_use;
+pub mod diagnostics;
+pub mod facts;
+pub mod invalidation;
+pub mod location;
+pub mod member_constraints;
+pub mod nll;
+pub mod path_utils;
+pub mod place_ext;
+pub mod places_conflict;
+pub mod prefixes;
+pub mod region_infer;
+pub mod renumber;
+pub mod type_check;
+pub mod universal_regions;
+pub mod used_muts;
 
 crate use borrow_set::{BorrowData, BorrowSet};
 crate use nll::{PoloniusOutput, ToRegionVid};
@@ -73,11 +73,11 @@ crate use region_infer::RegionInferenceContext;
 
 // FIXME(eddyb) perhaps move this somewhere more centrally.
 #[derive(Debug)]
-crate struct Upvar<'tcx> {
-    place: CapturedPlace<'tcx>,
+pub struct Upvar<'tcx> {
+    pub place: CapturedPlace<'tcx>,
 
     /// If true, the capture is behind a reference.
-    by_ref: bool,
+    pub by_ref: bool,
 }
 
 const DEREF_PROJECTION: &[PlaceElem<'_>; 1] = &[ProjectionElem::Deref];

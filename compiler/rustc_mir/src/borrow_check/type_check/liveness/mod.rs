@@ -18,9 +18,9 @@ use crate::borrow_check::{
 
 use super::TypeChecker;
 
-mod local_use_map;
-mod polonius;
-mod trace;
+pub mod local_use_map;
+pub mod polonius;
+pub mod trace;
 
 /// Combines liveness analysis with initialization analysis to
 /// determine which variables are live at which points, both due to

@@ -8,7 +8,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 
 /// Maps between a `Location` and a `PointIndex` (and vice versa).
-crate struct RegionValueElements {
+pub struct RegionValueElements {
     /// For each basic block, how many points are contained within?
     statements_before_block: IndexVec<BasicBlock, usize>,
 
@@ -20,7 +20,7 @@ crate struct RegionValueElements {
 }
 
 impl RegionValueElements {
-    crate fn new(body: &Body<'_>) -> Self {
+    pub fn new(body: &Body<'_>) -> Self {
         let mut num_points = 0;
         let statements_before_block: IndexVec<BasicBlock, usize> = body
             .basic_blocks()
@@ -130,7 +130,7 @@ crate enum RegionElement {
 
 /// When we initially compute liveness, we use a bit matrix storing
 /// points for each region-vid.
-crate struct LivenessValues<N: Idx> {
+pub struct LivenessValues<N: Idx> {
     elements: Rc<RegionValueElements>,
     points: SparseBitMatrix<N, PointIndex>,
 }
@@ -139,7 +139,7 @@ impl<N: Idx> LivenessValues<N> {
     /// Creates a new set of "region values" that tracks causal information.
     /// Each of the regions in num_region_variables will be initialized with an
     /// empty set of points and no causal information.
-    crate fn new(elements: Rc<RegionValueElements>) -> Self {
+    pub fn new(elements: Rc<RegionValueElements>) -> Self {
         Self { points: SparseBitMatrix::new(elements.num_points), elements }
     }
 
@@ -192,7 +192,7 @@ impl<N: Idx> LivenessValues<N> {
 /// rustc to the internal `PlaceholderIndex` values that are used in
 /// NLL.
 #[derive(Default)]
-crate struct PlaceholderIndices {
+pub struct PlaceholderIndices {
     indices: FxIndexSet<ty::PlaceholderRegion>,
 }
 

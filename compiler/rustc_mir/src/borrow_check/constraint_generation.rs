@@ -14,7 +14,7 @@ use crate::borrow_check::{
     places_conflict, region_infer::values::LivenessValues,
 };
 
-pub(super) fn generate_constraints<'cx, 'tcx>(
+pub fn generate_constraints<'cx, 'tcx>(
     infcx: &InferCtxt<'cx, 'tcx>,
     liveness_constraints: &mut LivenessValues<RegionVid>,
     all_facts: &mut Option<AllFacts>,

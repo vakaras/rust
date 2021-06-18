@@ -23,16 +23,16 @@ use super::borrow_set::BorrowData;
 use super::MirBorrowckCtxt;
 use crate::dataflow::move_paths::{InitLocation, LookupResult};
 
-mod find_use;
-mod outlives_suggestion;
-mod region_name;
-mod var_name;
+pub mod find_use;
+pub mod outlives_suggestion;
+pub mod region_name;
+pub mod var_name;
 
-mod conflict_errors;
-mod explain_borrow;
-mod move_errors;
-mod mutability_errors;
-mod region_errors;
+pub mod conflict_errors;
+pub mod explain_borrow;
+pub mod move_errors;
+pub mod mutability_errors;
+pub mod region_errors;
 
 crate use mutability_errors::AccessKind;
 crate use outlives_suggestion::OutlivesSuggestionBuilder;

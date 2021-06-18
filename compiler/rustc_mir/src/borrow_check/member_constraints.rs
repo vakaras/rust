@@ -9,7 +9,7 @@ use std::ops::Index;
 
 /// Compactly stores a set of `R0 member of [R1...Rn]` constraints,
 /// indexed by the region `R0`.
-crate struct MemberConstraintSet<'tcx, R>
+pub struct MemberConstraintSet<'tcx, R>
 where
     R: Copy + Eq,
 {

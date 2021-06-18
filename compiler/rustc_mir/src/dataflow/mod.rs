@@ -25,8 +25,8 @@ pub(crate) mod indexes {
 }
 
 pub struct MoveDataParamEnv<'tcx> {
-    pub(crate) move_data: MoveData<'tcx>,
-    pub(crate) param_env: ty::ParamEnv<'tcx>,
+    pub move_data: MoveData<'tcx>,
+    pub param_env: ty::ParamEnv<'tcx>,
 }
 
 pub(crate) fn has_rustc_mir_with(

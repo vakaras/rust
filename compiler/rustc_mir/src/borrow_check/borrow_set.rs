@@ -12,7 +12,7 @@ use rustc_middle::ty::{RegionVid, TyCtxt};
 use std::fmt;
 use std::ops::Index;
 
-crate struct BorrowSet<'tcx> {
+pub struct BorrowSet<'tcx> {
     /// The fundamental map relating bitvector indexes to the borrows
     /// in the MIR. Each borrow is also uniquely identified in the MIR
     /// by the `Location` of the assignment statement in which it
@@ -50,7 +50,7 @@ crate enum TwoPhaseActivation {
 }
 
 #[derive(Debug, Clone)]
-crate struct BorrowData<'tcx> {
+pub struct BorrowData<'tcx> {
     /// Location where the borrow reservation starts.
     /// In many cases, this will be equal to the activation location but not always.
     crate reserve_location: Location,

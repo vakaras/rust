@@ -4,14 +4,14 @@ pub mod elaborate_drops;
 pub mod patch;
 pub mod storage;
 
-mod alignment;
+pub mod alignment;
 pub mod collect_writes;
-mod find_self_call;
-mod generic_graph;
-pub(crate) mod generic_graphviz;
-mod graphviz;
-pub(crate) mod pretty;
-pub(crate) mod spanview;
+pub mod find_self_call;
+pub mod generic_graph;
+pub mod generic_graphviz;
+pub mod graphviz;
+pub mod pretty;
+pub mod spanview;
 
 pub use self::aggregate::expand_aggregate;
 pub use self::alignment::is_disaligned;

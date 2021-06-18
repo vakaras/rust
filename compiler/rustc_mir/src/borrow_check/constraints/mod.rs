@@ -7,14 +7,14 @@ use std::ops::Index;
 
 use crate::borrow_check::type_check::Locations;
 
-crate mod graph;
+pub mod graph;
 
 /// A set of NLL region constraints. These include "outlives"
 /// constraints of the form `R1: R2`. Each constraint is identified by
 /// a unique `OutlivesConstraintIndex` and you can index into the set
 /// (`constraint_set[i]`) to access the constraint details.
 #[derive(Clone, Default)]
-crate struct OutlivesConstraintSet<'tcx> {
+pub struct OutlivesConstraintSet<'tcx> {
     outlives: IndexVec<OutlivesConstraintIndex, OutlivesConstraint<'tcx>>,
 }
 
