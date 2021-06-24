@@ -17,7 +17,7 @@ use rustc_middle::mir::{AggregateKind, BasicBlock, BorrowCheckResult, BorrowKind
 use rustc_middle::mir::{Field, ProjectionElem, Promoted, Rvalue, Statement, StatementKind};
 use rustc_middle::mir::{InlineAsmOperand, Terminator, TerminatorKind};
 use rustc_middle::ty::query::Providers;
-use rustc_middle::ty::{self, CapturedPlace, ParamEnv, RegionVid, TyCtxt};
+use rustc_middle::ty::{self, CapturedPlace, ParamEnv, RegionVid, TyCtxt, WithOptConstParam};
 use rustc_session::lint::builtin::{MUTABLE_BORROW_RESERVATION_CONFLICT, UNUSED_MUT};
 use rustc_span::{Span, Symbol, DUMMY_SP};
 
@@ -48,6 +48,7 @@ use self::path_utils::*;
 mod borrow_set;
 mod constraint_generation;
 mod constraints;
+pub mod consumers;
 mod def_use;
 mod diagnostics;
 mod facts;
@@ -148,22 +149,7 @@ fn do_mir_borrowck<'a, 'tcx>(
         }
     }
 
-    // Gather the upvars of a closure, if any.
-    let tables = tcx.typeck_opt_const_arg(def);
-    if let Some(ErrorReported) = tables.tainted_by_errors {
-        infcx.set_tainted_by_errors();
-    }
-    let upvars: Vec<_> = tables
-        .closure_min_captures_flattened(def.did.to_def_id())
-        .map(|captured_place| {
-            let capture = captured_place.info.capture_kind;
-            let by_ref = match capture {
-                ty::UpvarCapture::ByValue(_) => false,
-                ty::UpvarCapture::ByRef(..) => true,
-            };
-            Upvar { place: captured_place.clone(), by_ref }
-        })
-        .collect();
+    let upvars = gather_closure_upvars(infcx, def);
 
     // Replace all regions with fresh inference variables. This
     // requires first making our own copy of the MIR. This copy will
@@ -202,6 +188,7 @@ fn do_mir_borrowck<'a, 'tcx>(
     let nll::NllOutput {
         regioncx,
         opaque_type_values,
+        polonius_input: _,
         polonius_output,
         opt_closure_req,
         nll_errors,
@@ -449,6 +436,28 @@ fn do_mir_borrowck<'a, 'tcx>(
     debug!("do_mir_borrowck: result = {:#?}", result);
 
     result
+}
+
+/// Gather the upvars of a closure, if any.
+fn gather_closure_upvars<'a, 'tcx>(
+    infcx: &InferCtxt<'a, 'tcx>,
+    def: WithOptConstParam<LocalDefId>,
+) -> Vec<Upvar<'tcx>> {
+    let tables = infcx.tcx.typeck_opt_const_arg(def);
+    if let Some(ErrorReported) = tables.tainted_by_errors {
+        infcx.set_tainted_by_errors();
+    }
+    tables
+        .closure_min_captures_flattened(def.did.to_def_id())
+        .map(|captured_place| {
+            let capture = captured_place.info.capture_kind;
+            let by_ref = match capture {
+                ty::UpvarCapture::ByValue(_) => false,
+                ty::UpvarCapture::ByRef(..) => true,
+            };
+            Upvar { place: captured_place.clone(), by_ref }
+        })
+        .collect()
 }
 
 crate struct MirBorrowckCtxt<'cx, 'tcx> {
