@@ -202,6 +202,7 @@ fn do_mir_borrowck<'a, 'tcx>(
     let nll::NllOutput {
         regioncx,
         opaque_type_values,
+        polonius_input: _,
         polonius_output,
         opt_closure_req,
         nll_errors,

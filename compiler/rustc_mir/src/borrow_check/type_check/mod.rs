@@ -831,7 +831,7 @@ struct BorrowCheckContext<'a, 'tcx> {
     upvars: &'a [Upvar<'tcx>],
 }
 
-crate struct MirTypeckResults<'tcx> {
+pub struct MirTypeckResults<'tcx> {
     pub constraints: MirTypeckRegionConstraints<'tcx>,
     pub universal_region_relations: Frozen<UniversalRegionRelations<'tcx>>,
     pub opaque_type_values: VecMap<OpaqueTypeKey<'tcx>, Ty<'tcx>>,

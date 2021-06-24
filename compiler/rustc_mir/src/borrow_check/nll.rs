@@ -40,13 +40,14 @@ use crate::borrow_check::{
     Upvar,
 };
 
-crate type PoloniusOutput = Output<RustcFacts>;
+pub type PoloniusOutput = Output<RustcFacts>;
 
 /// The output of `nll::compute_regions`. This includes the computed `RegionInferenceContext`, any
 /// closure requirements to propagate, and any generated errors.
-crate struct NllOutput<'tcx> {
+pub struct NllOutput<'tcx> {
     pub regioncx: RegionInferenceContext<'tcx>,
     pub opaque_type_values: VecMap<OpaqueTypeKey<'tcx>, Ty<'tcx>>,
+    pub polonius_input: Option<Box<AllFacts>>,
     pub polonius_output: Option<Rc<PoloniusOutput>>,
     pub opt_closure_req: Option<ClosureRegionRequirements<'tcx>>,
     pub nll_errors: RegionErrors<'tcx>,
@@ -55,7 +56,7 @@ crate struct NllOutput<'tcx> {
 /// Rewrites the regions in the MIR to use NLL variables, also scraping out the set of universal
 /// regions (e.g., region parameters) declared on the function. That set will need to be given to
 /// `compute_regions`.
-pub(in crate::borrow_check) fn replace_regions_in_mir<'cx, 'tcx>(
+pub fn replace_regions_in_mir<'cx, 'tcx>(
     infcx: &InferCtxt<'cx, 'tcx>,
     param_env: ty::ParamEnv<'tcx>,
     body: &mut Body<'tcx>,
@@ -78,7 +79,7 @@ pub(in crate::borrow_check) fn replace_regions_in_mir<'cx, 'tcx>(
 
 // This function populates an AllFacts instance with base facts related to
 // MovePaths and needed for the move analysis.
-fn populate_polonius_move_facts(
+pub fn populate_polonius_move_facts(
     all_facts: &mut AllFacts,
     move_data: &MoveData<'_>,
     location_table: &LocationTable,
@@ -154,7 +155,7 @@ fn populate_polonius_move_facts(
 /// Computes the (non-lexical) regions from the input MIR.
 ///
 /// This may result in errors being reported.
-pub(in crate::borrow_check) fn compute_regions<'cx, 'tcx>(
+pub fn compute_regions<'cx, 'tcx>(
     infcx: &InferCtxt<'cx, 'tcx>,
     universal_regions: UniversalRegions<'tcx>,
     body: &Body<'tcx>,
@@ -271,7 +272,7 @@ pub(in crate::borrow_check) fn compute_regions<'cx, 'tcx>(
     let def_id = body.source.def_id();
 
     // Dump facts if requested.
-    let polonius_output = all_facts.and_then(|all_facts| {
+    let polonius_output = all_facts.as_ref().and_then(|all_facts| {
         if infcx.tcx.sess.opts.debugging_opts.nll_facts {
             let def_path = infcx.tcx.def_path(def_id);
             let dir_path = PathBuf::from(&infcx.tcx.sess.opts.debugging_opts.nll_facts_dir)
@@ -305,6 +306,7 @@ pub(in crate::borrow_check) fn compute_regions<'cx, 'tcx>(
     NllOutput {
         regioncx,
         opaque_type_values: remapped_opaque_tys,
+        polonius_input: all_facts.map(Box::new),
         polonius_output,
         opt_closure_req: closure_region_requirements,
         nll_errors,
